@@ -41,6 +41,10 @@ Change seeded passwords and set a long random `JWT_SECRET` before exposing the a
 - Backend-enforced roles for astronauts, assigned medical officers, and administrators.
 - SQLite persistence, validated health readings, per-astronaut baselines, audit records, hashed passwords, short-lived signed access tokens, rotating refresh tokens, and session revocation on logout.
 - Timestamped synthetic health, environmental and equipment telemetry for four fictional astronauts; simulation supports normal, adaptation, exercise, sleep, respiratory, environment, wearable, equipment and recovery scenarios.
+- Dedicated Live Data view with astronaut-scoped heart rate, HRV, oxygen saturation, respiration, temperature, cabin/environment, equipment, and radiation readings, including source, quality, freshness, and stored history. It refreshes from received telemetry; it does not manufacture connected readings.
+- Mission administration can create missions and manage crew access. The Launch & Ascent workspace supports eight rehearsal phases and persists each phase as explicitly synthetic telemetry.
+- Alert review includes severity/status summaries, filters, detail evidence, acknowledge/resolve actions, and in-app notices for newly received alerts.
+- Health assistant requests are scope-checked on the backend before any external provider call. The optional API key configures a provider; it does not train or fine-tune the model and is never placed in the browser bundle.
 - A trained Isolation Forest implementation with model persistence, inference, anomaly scores, risk review categories, and evaluation against held-out synthetic data.
 - Alert creation, duplicate grouping for repeat non-critical rules, acknowledgement, and resolution.
 - Local retrieval over a small source catalog, permission-aware health context, citations, conversation history, and an optional OpenAI-compatible LLM provider configured only on the server.
@@ -62,7 +66,7 @@ For data provenance, note that the [MIT-BIH Arrhythmia Database](https://physion
 - [Hackathon submission notes](docs/hackathon-submission.md)
 - [AI-use and data provenance](docs/ai-use.md)
 
-The in-app research catalog and source map describe NASA Standard Measures, OSDR, GeneLab, NASA Human Research Program, environmental standards, ECLSS and the terrestrial MIT-BIH dataset. HealthKit, Health Connect and Garmin are documented as possible provider pathways, but no device-service credentials or live connectors are configured.
+The in-app research catalog and source map describe NASA Standard Measures, OSDR, GeneLab, NASA Human Research Program, environmental standards, ECLSS and the terrestrial MIT-BIH dataset. NASA human-system environmental measures inform the launch and cabin channel catalog; they are not universal safety thresholds. The sign-in page includes a credited NASA/Joel Kowsky Artemis I launch photo. HealthKit, Health Connect and Garmin are documented as possible provider pathways, but no device-service credentials or live connectors are configured.
 
 ## Environment and containers
 

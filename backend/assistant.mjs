@@ -4,6 +4,12 @@ import { db, createId, nowIso } from './db.mjs';
 const stop = new Set('a an the is are was were be been being of for to in on with and or my our your how what why explain summarize summary about does do has have from last recent current me it this that than over'.split(' '));
 const terms = (value) => String(value || '').toLowerCase().match(/[a-z0-9-]{2,}/g)?.filter((word) => !stop.has(word)) || [];
 
+const healthScope = /\b(health|medical|clinical|symptom|wellness|wellbeing|heart|cardio|pulse|hrv|spo2|oxygen|breath|respirat\w*|sleep|fatigue|stress|mood|bone|immune|radiation|dose|hydration|nutrition|exercise|activity|injury|medication|medicine|alert|anomal\w*|temperature|blood|pressure|cabin|humidity|atmospher\w*|acceleration|dynamic load|vibration|vehicle altitude|vehicle velocity|suit|telemetry|sensor|flight phase|mission health)\b/i;
+
+export function isHealthRelated(query) {
+  return healthScope.test(String(query || '').slice(0, 1500));
+}
+
 export function retrieve(query, limit = 3) {
   const queryTerms = [...new Set(terms(query))];
   if (!queryTerms.length) return [];

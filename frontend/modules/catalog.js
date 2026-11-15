@@ -1,6 +1,7 @@
 export const MODULES = [
   { id: 'missions', icon: '✦', label: 'Mission selection', group: 'MISSION', state: 'active', api: ['/api/dashboard'] },
   { id: 'overview', icon: '⌂', label: 'Mission overview', group: 'MISSION', state: 'active', api: ['/api/dashboard'] },
+  { id: 'launch', icon: '↗', label: 'Launch & ascent', group: 'MISSION SYSTEMS', state: 'active', api: ['/api/environment', '/api/simulation/launch-phase'] },
   { id: 'crew', icon: '◉', label: 'Crew roster', group: 'MISSION', state: 'active', api: ['/api/astronauts'] },
   { id: 'records', icon: '▣', label: 'Astronaut records', group: 'ACCESS', state: 'active', api: ['/api/astronauts/{id}', '/api/health/{id}'] },
   { id: 'sentinel', icon: '◈', label: 'ASTRA SENTINEL', group: 'MISSION INTELLIGENCE', state: 'active', api: ['/api/sentinel'] },

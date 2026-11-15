@@ -5,6 +5,7 @@
   "demoProfiles": "Fictional identities generated for demonstration.",
   "healthReadings": "Synthetic time-series values generated locally by code; not astronaut measurements.",
   "radiationReadings": "Synthetic demonstration values unless an imported source is explicitly recorded.",
+  "launchTelemetry": "Launch-phase rehearsal values are synthetic examples, not vehicle-specific flight data, validated limits, or launch clearance.",
   "modelTrainingData": "Synthetic normalized reference telemetry generated locally by code.",
   "clinicalValidation": false,
   "externalDataDownloads": false,
