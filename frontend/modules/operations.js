@@ -1,7 +1,7 @@
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char]);
 const phases = [
   ['countdown','Countdown'],['liftoff','Liftoff'],['ascent','Ascent'],['stage-separation','Stage separation'],
-  ['orbit-insertion','Orbit insertion'],['on-orbit','On orbit'],['entry','Entry'],['landing','Landing'],['contingency','Contingency']
+  ['orbit-insertion','Orbit insertion'],['on-orbit','On orbit'],['entry','Entry'],['landing','Landing']
 ];
 const fmt = (value, digits = 2) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString(undefined,{maximumFractionDigits:digits});
 const age = (time) => {
@@ -68,4 +68,4 @@ export function drawLaunch({ crew, environmental = {}, alerts = [], phase = '', 
     ].map(([label,value,note])=>`<div class="card"><div class="stat-label">${esc(label)}</div><div class="metric-row"><span class="metric-big launch-stat-value">${esc(value)}</span></div><div class="baseline-note">${esc(note)}</div></div>`).join('')}</div>
     ${controls}
     <section class="card"><div class="card-title-row"><div><h2 class="card-title">Crew health measurements</h2><div class="card-kicker">Most recent authorized values; detail and trend history are available in the separate live monitor.</div></div><a class="link-button" href="${liveLink}" target="_blank" rel="noopener">Open full health record ↗</a></div><div class="grid launch-data-grid">${healthCards}</div></section>
-    <section class="card"><div class="card-tit
+    <section class="card"><div class="card-title-row"><div><h2 class="card-t

@@ -13,12 +13,12 @@ ASTRA is a local-first research prototype for astronaut self-monitoring and miss
 Requirements: Node.js 24 or later. The app uses Node's built-in SQLite, HTTP, WebSocket, crypto, and file APIs, so no npm package installation is needed.
 
 ```powershell
-node backend/server.mjs
+node --env-file-if-exists=.env backend/server.mjs
 ```
 
 Open [http://127.0.0.1:4173](http://127.0.0.1:4173). On Linux or macOS, run the same command from the project directory. The database is created at `data/astra.sqlite` the first time the server starts. Stop the server with Ctrl+C.
 
-For development, use `node --watch backend/server.mjs`. Train and persist a fresh Isolation Forest with `node backend/train.mjs`. Run the automated core checks with `node --test`.
+For development, use `node --env-file-if-exists=.env --watch backend/server.mjs`. Train and persist a fresh Isolation Forest with `node backend/train.mjs`. Run the automated core checks with `node --test`.
 
 ### Local demonstration accounts
 
