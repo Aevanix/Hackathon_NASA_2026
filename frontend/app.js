@@ -1,5 +1,5 @@
-import { MODULES, MODULES_BY_ID } from './modules/catalog.js';
-import { drawLaunch, drawLiveTelemetry, drawMissionAccess } from './modules/operations.js';
+import { MODULES, MODULES_BY_ID } from './modules/catalog.js?v=4';
+import { drawLaunch, drawLiveTelemetry, drawMissionAccess } from './modules/operations.js?v=5';
 
 const savedDataMode=localStorage.getItem('astra.dataMode');
 const ASTRA = { token: localStorage.getItem('astra.access') || '', refresh: localStorage.getItem('astra.refresh') || '', dataMode: savedDataMode==='mission'?'connected':['connected','simulation','research'].includes(savedDataMode)?savedDataMode:'simulation', user: null };

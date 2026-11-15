@@ -1,0 +1,94 @@
+/* ASTRA polish layer: motion, depth, and interaction. Respects prefers-reduced-motion. */
+:root{--glow:rgba(84,193,255,.16);--ease:cubic-bezier(.22,.8,.24,1)}
+#starfield{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.72}
+#app{position:relative;z-index:1}
+body.no-stars #starfield{display:none}
+
+/* Page entrance */
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.page-enter .page-head,.page-enter .card,.page-enter .notice,.page-enter .grid>*{animation:rise .55s var(--ease) both}
+.page-enter .card:nth-child(2),.page-enter .grid>*:nth-child(2){animation-delay:.05s}
+.page-enter .card:nth-child(3),.page-enter .grid>*:nth-child(3){animation-delay:.1s}
+.page-enter .card:nth-child(4),.page-enter .grid>*:nth-child(4){animation-delay:.15s}
+.page-enter .card:nth-child(n+5),.page-enter .grid>*:nth-child(n+5){animation-delay:.2s}
+
+/* Cards: depth, hover lift, cursor spotlight */
+.card{position:relative;transition:transform .25s var(--ease),border-color .25s,box-shadow .25s}
+.card:hover{transform:translateY(-2px);border-color:#2f5573;box-shadow:0 16px 38px rgba(0,0,0,.28),0 0 0 1px rgba(84,193,255,.08)}
+.card:before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%),var(--glow),transparent 70%)}
+.card:hover:before{opacity:1}
+.stat-card .stat-value,.metric-big{color:#d9efff}
+@supports (-webkit-background-clip:text){.stat-card .stat-value,.metric-big{background:linear-gradient(180deg,#fff,#a9dcf8);-webkit-background-clip:text;background-clip:text;color:transparent}}
+.launch-phase:hover{transform:translateY(-1px)}
+
+/* Navigation */
+.nav-link{position:relative;transition:background .18s,color .18s,transform .18s var(--ease),padding-left .18s}
+.nav-link:hover{transform:translateX(3px)}
+.nav-link.active{background:linear-gradient(90deg,#173450,#10243a)}
+.nav-link.active:after{content:"";position:absolute;right:10px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--blue);box-shadow:0 0 10px var(--blue)}
+.brand-mark{box-shadow:inset 0 0 0 1px #234864,0 0 22px rgba(84,193,255,.28)}
+
+/* Buttons */
+.btn{position:relative;overflow:hidden;transition:transform .15s var(--ease),background .15s,border-color .15s,box-shadow .2s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:linear-gradient(135deg,#1a8fc4,#1368a0);box-shadow:0 6px 18px rgba(26,143,196,.28)}
+.btn.primary:hover{box-shadow:0 8px 26px rgba(84,193,255,.38);transform:translateY(-1px)}
+.btn .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);transform:scale(0);animation:ripple .6s linear;pointer-events:none}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
+
+/* Status dots pulse */
+.status-dot{animation:pulse 2.4s ease-in-out infinite}
+.status-dot.amber{animation-duration:1.6s}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 currentColor}50%{box-shadow:0 0 9px 2px currentColor}}
+
+/* Topbar additions */
+.mission-clock{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#0c1a29;border-radius:999px;padding:5px 10px;font:600 10px ui-monospace,SFMono-Regular,Consolas,monospace;color:#9fd8f5;letter-spacing:.04em;white-space:nowrap}
+.cmd-trigger{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#0e1d2d;color:#9db2c4;border-radius:9px;padding:7px 10px;font-size:11px}
+.cmd-trigger:hover{border-color:#36536c;color:#e9f1f8}
+.cmd-trigger kbd,.cmd-foot kbd{font:600 9px ui-monospace,Consolas,monospace;border:1px solid #2a4258;background:#0a1624;border-radius:4px;padding:2px 5px;color:#8fb3cc}
+
+/* Command palette */
+.cmd-overlay{position:fixed;inset:0;z-index:50;display:none;align-items:flex-start;justify-content:center;padding:12vh 16px 16px;background:rgba(3,9,16,.66);backdrop-filter:blur(6px)}
+.cmd-overlay.open{display:flex;animation:fade .15s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.cmd-box{width:min(620px,100%);border:1px solid #2b4a63;border-radius:16px;background:linear-gradient(160deg,#10243a,#0a1624);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(84,193,255,.1);overflow:hidden;animation:rise .25s var(--ease)}
+.cmd-input{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--text);padding:17px 18px;font-size:15px;outline:none}
+.cmd-list{max-height:min(52vh,420px);overflow-y:auto;padding:8px;margin:0;list-style:none}
+.cmd-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:#b7c8d8;font-size:13px;cursor:pointer}
+.cmd-item .nav-ico{width:20px}
+.cmd-item small{margin-left:auto;color:#647b90;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.cmd-item.sel{background:#173450;color:#fff;box-shadow:inset 2px 0 var(--blue)}
+.cmd-empty{padding:22px;text-align:center;color:var(--muted);font-size:12px}
+.cmd-foot{display:flex;gap:14px;padding:9px 14px;border-top:1px solid var(--line);font-size:10px;color:#6f879b}
+
+/* Scroll-to-top */
+.to-top{position:fixed;right:22px;bottom:22px;z-index:6;width:42px;height:42px;border-radius:50%;border:1px solid #2b4a63;background:#10243a;color:var(--blue);font-size:18px;opacity:0;pointer-events:none;transform:translateY(10px);transition:.25s var(--ease)}
+.to-top.show{opacity:1;pointer-events:auto;transform:none}
+.to-top:hover{background:#173450;box-shadow:0 0 20px var(--glow)}
+
+/* Sign-in page */
+.login-hero h1 span{background:linear-gradient(90deg,#54c1ff,#5fddb1);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-point{transition:transform .2s var(--ease),border-color .2s}
+.hero-point:hover{transform:translateY(-2px)}
+.hero-photo{transition:transform .5s var(--ease),box-shadow .5s}
+.hero-photo:hover{transform:scale(1.015);box-shadow:0 24px 60px rgba(84,193,255,.18)}
+.input:focus,.select:focus{border-color:#3a9fd0;box-shadow:0 0 0 3px rgba(84,193,255,.16);outline:none}
+
+/* Tables */
+.data-table tbody tr{transition:background .15s}
+.data-table tbody tr:hover{background:rgba(84,193,255,.06)}
+
+@media(max-width:790px){.cmd-trigger span.lbl,.mission-clock{display:none}.to-top{right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}}
+@media(prefers-reduced-motion:reduce){.page-enter *,.status-dot,.cmd-box,.cmd-overlay.open{animation:none!important}.card:hover,.nav-link:hover{transform:none}#starfield{display:none}}
+
+/* Topbar: keep items on one line, drop extras on narrower screens */
+.page-context,.cmd-trigger,.user-name,.user-role,.mission-chip,.status-chip{white-space:nowrap}
+.topbar{gap:12px}.top-left{min-width:0;flex:0 1 auto}.top-actions{gap:10px;flex:0 0 auto}
+@media(max-width:1500px){.mission-clock{display:none}}
+@media(max-width:1280px){.cmd-trigger .lbl{display:none}.current-user .user-role{display:none}}
+@media(max-width:1100px){.cmd-trigger kbd{display:none}}
+
+.hero-photo.img-failed{background:radial-gradient(circle at 70% 20%,#1d4d73 0,#0d1b2a 55%),#0d1b2a}
+.hero-photo.img-failed img{display:none}
+.hero-photo.img-failed:before{content:"Artemis I · image unavailable offline";position:absolute;inset:0;display:grid;place-items:center;color:#7fa3bd;font-size:12px;letter-spacing:.08em}

@@ -48,6 +48,12 @@ Medical officers only see astronauts assigned to their account.
 
 Sign in → inspect mission dashboard → manage crew and users → run a synthetic scenario → review model/evaluation status and audit log → prepare mission reports.
 
+## Shared interface layer
+
+`frontend/modules/polish.js` adds a keyboard-accessible module palette (`Ctrl/Cmd+K` or `/`), a UTC clock, reduced-motion-aware page transitions, and a low-density starfield that pauses while the tab is hidden. `frontend/modules/upgrade.js` adds role-aware mobile shortcuts, persistent accent themes, keyboard-sortable tables, table search that survives live redraws, and sparklines built only from values already rendered by the selected data view. The companion styles live in `frontend/polish.css` and `frontend/upgrade.css`, and the service worker precaches those assets for offline use.
+
+The extra visual effects are optional decoration; core navigation and data controls remain ordinary buttons and links. Data tables continue to show source, quality, freshness, and simulation or research classification where the API supplies them.
+
 ## Module contract for future work
 
 Each module should own a focused page, a documented API path, persistence/provenance fields, role rules, empty/error/offline behavior, and a test. Do not mark a research scaffold as a working sensor feed until a real approved data source is connected and validated. New medical indicators should record unit, time, source, quality, simulation flag, and subject-specific reference where suitable.

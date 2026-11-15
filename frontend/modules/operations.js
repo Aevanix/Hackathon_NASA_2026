@@ -6,10 +6,16 @@ const phases = [
 const fmt = (value, digits = 2) => value === null || value === undefined || !Number.isFinite(Number(value)) ? '—' : Number(value).toLocaleString(undefined,{maximumFractionDigits:digits});
 const age = (time) => {
   if (!time) return 'No timestamp';
-  const minutes = Math.max(0,Math.round((Date.now()-new Date(time).getTime())/60000));
-  return minutes < 1 ? 'just now' : minutes < 60 ? `${minutes} min ago` : `${Math.floor(minutes/60)} h ago`;
+  const parsed = new Date(time).getTime();
+  if (!Number.isFinite(parsed)) return 'Unknown timestamp';
+  const minutes = Math.max(0,Math.round((Date.now()-parsed)/60000));
+  return minutes < 1 ? 'just now' : minutes < 60 ? `${minutes} min ago` : minutes < 1440 ? `${Math.floor(minutes/60)} h ago` : `${Math.floor(minutes/1440)} d ago`;
 };
-const freshness = (time) => !time ? 'NO DATA' : Date.now()-new Date(time).getTime()>15*60_000 ? 'STALE' : 'FRESH';
+const freshness = (time) => {
+  if (!time) return 'NO DATA';
+  const parsed = new Date(time).getTime();
+  return !Number.isFinite(parsed) ? 'UNKNOWN' : Date.now()-parsed>15*60_000 ? 'STALE' : 'FRESH';
+};
 
 export function drawMissionAccess({ missions = [], crew = [], isAdmin = false, missionDay }) {
   const items = missions.map((mission) => ({
@@ -28,8 +34,8 @@ export function drawMissionAccess({ missions = [], crew = [], isAdmin = false, m
 
 export function drawLaunch({ crew, environmental = {}, alerts = [], phase = '', role = '', mode = 'simulation', feedStatus = 'disconnected', missionDay }) {
   if (!crew) return '<div class="empty">No astronaut profile is available in this account scope.</div>';
-  const sensors = environmental.sensors || [];
-  const records = sensors.map((sensor) => ({ sensor, reading: sensor.history?.at(-1) }));
+  const sensors = Array.isArray(environmental.sensors) ? environmental.sensors : [];
+  const records = sensors.map((sensor) => ({ sensor, reading: Array.isArray(sensor.history) ? sensor.history[sensor.history.length - 1] : undefined }));
   const latestPhaseSample = records.map(({reading})=>reading).filter(Boolean).sort((a,b)=>String(b.recordedAt).localeCompare(String(a.recordedAt)))[0];
   const sourcePhase = latestPhaseSample?.source?.match(/launch rehearsal · ([^·]+)/i)?.[1]?.trim().toLowerCase();
   const activePhase = phase || (phases.some(([id])=>id===sourcePhase) ? sourcePhase : '');
@@ -38,7 +44,7 @@ export function drawLaunch({ crew, environmental = {}, alerts = [], phase = '', 
   const sensorCard = (label, metric, precision = 2) => {
     const {sensor,reading} = getSensor(metric);
     const state = freshness(reading?.recordedAt);
-    const history = sensor?.history || [];
+    const history = Array.isArray(sensor?.history) ? sensor.history : [];
     return `<article class="card launch-metric"><div class="launch-metric-top"><span class="stat-label">${esc(label)}</span><span class="source-chip"><i class="status-dot ${state==='STALE'?'amber':''}"></i>${state}</span></div><div class="metric-row"><span class="metric-big">${fmt(reading?.value,precision)}</span><span class="metric-unit">${esc(sensor?.unit||'')}</span></div><div class="baseline-note">${esc(sensor?.name||'No source registered')} · ${esc(age(reading?.recordedAt))}</div><div class="baseline-note">${esc(reading?.source||sensor?.source||'No telemetry received')}${reading?.simulated?' · SIMULATED':''}</div>${history.length ? `<details class="launch-history"><summary>Inspect ${history.length} stored samples</summary><div class="table-wrap"><table class="data-table"><thead><tr><th>Recorded</th><th>Value</th><th>Quality</th><th>Source</th></tr></thead><tbody>${history.slice(-8).reverse().map((row)=>`<tr><td>${esc(new Date(row.recordedAt).toLocaleString())}</td><td>${fmt(row.value,precision)} ${esc(row.unit)}</td><td>${esc(row.dataQuality||'not supplied')}</td><td>${esc(row.source)}${row.simulated?' · SIM':''}</td></tr>`).join('')}</tbody></table></div></details>` : ''}</article>`;
   };
   const healthItems = [
@@ -72,19 +78,36 @@ export function drawLaunch({ crew, environmental = {}, alerts = [], phase = '', 
     <section class="card"><h2 class="card-title">Data-readiness checks</h2><div class="checklist"><div class="check-item"><span>Health feed freshness</span><b>${freshness(crew.latest?.recordedAt)} · ${esc(age(crew.latest?.recordedAt))}</b></div><div class="check-item"><span>Environmental timestamps</span><b>${records.filter(({reading})=>reading&&freshness(reading.recordedAt)==='FRESH').length} fresh · ${records.filter(({reading})=>!reading).length} without samples</b></div><div class="check-item"><span>Alert review queue</span><b>${openCount} open item${openCount===1?'':'s'}</b></div><div class="check-item"><span>Telemetry classification</span><b>${mode==='simulation'?'Synthetic demo view':esc(mode)} · inspect source per reading</b></div></div><p class="footer-note">These checks describe data availability only. ASTRA does not issue a flight-ready or no-go decision.</p></section>`;
 }
 
-export function drawLiveTelemetry({ environmental = {}, equipment = {}, radiation = [] }) {
-  const sensors = environmental.sensors || [];
+export function drawLiveTelemetry({ environmental = {}, equipment = {}, radiation = [] } = {}) {
+  const sensors = Array.isArray(environmental.sensors) ? environmental.sensors : [];
+  const devices = Array.isArray(equipment.equipment) ? equipment.equipment : [];
+  const radiationRows = Array.isArray(radiation) ? radiation.slice(0, 12) : [];
+  const recordClass = (record, fallback = '') => record?.simulated ? 'SIMULATED' : record?.dataClass || fallback || 'SOURCE NOT SPECIFIED';
   const sensorRows = sensors.map((sensor) => {
-    const latest = sensor.history?.at(-1);
-    const samples = sensor.history || [];
-    return `<tr><td>${esc(sensor.name)}<br><span class="muted">${esc(sensor.metric)}</span></td><td>${fmt(latest?.value,3)} ${esc(latest?.unit||sensor.unit)}</td><td>${esc(age(latest?.recordedAt))}</td><td>${esc(latest?.source||sensor.source)}${latest?.simulated?' · SIMULATED':''}</td><td>${samples.length} stored</td></tr>`;
-  }).join('');
-  const devices = equipment.equipment || [];
-  const deviceRows = devices.map((device)=>`<tr><td>${esc(device.name)}</td><td>${esc(device.status)}</td><td>${fmt(device.batteryPercent,1)}%</td><td>${fmt(device.temperatureC,1)} °C</td><td>${esc(age(device.lastSeenAt))}</td><td>${esc(device.source)}${device.simulated?' · SIMULATED':''}</td></tr>`).join('');
-  const latestRadiation = radiation[0];
-  return `<section class="card live-streams"><div class="card-title-row"><div><h2 class="card-title">Other incoming telemetry</h2><div class="card-kicker">Environmental, equipment and dosimeter feeds refresh with the health stream.</div></div></div>
-    <h3 class="live-stream-title">Cabin and suit sensors</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Source</th><th>Latest reading</th><th>Freshness</th><th>Provenance</th><th>History</th></tr></thead><tbody>${sensorRows||'<tr><td colspan="5" class="muted">No environmental feed is available for this astronaut in the selected data view.</td></tr>'}</tbody></table></div>
-    <h3 class="live-stream-title">Wearables and equipment</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Device</th><th>Status</th><th>Battery</th><th>Temperature</th><th>Freshness</th><th>Source</th></tr></thead><tbody>${deviceRows||'<tr><td colspan="6" class="muted">No equipment feed is available in this data view.</td></tr>'}</tbody></table></div>
-    <h3 class="live-stream-title">Radiation dosimeter</h3><div class="checklist"><div class="check-item"><span>Latest dose rate</span><b>${latestRadiation?fmt(latestRadiation.value,5)+' '+esc(latestRadiation.unit):'No dosimeter reading'}</b></div><div class="check-item"><span>Cumulative dose</span><b>${latestRadiation?fmt(latestRadiation.cumulative,4)+' mSv':'—'}</b></div><div class="check-item"><span>Timestamp / source</span><b>${latestRadiation?esc(age(latestRadiation.recorded_at))+' · '+esc(latestRadiation.source)+(latestRadiation.simulated?' · SIMULATED':''):'No source data'}</b></div></div>
-    <p class="footer-note">Only imported or connected source records are operational telemetry. Demo records are explicitly labeled simulated; values may be stale or absent.</p></section>`;
+    const samples = Array.isArray(sensor.history) ? sensor.history : [];
+    const latest = samples[samples.length - 1];
+    const reading = latest ? `${fmt(latest.value,3)} ${esc(latest.unit || sensor.unit || '')}` : 'No sample received';
+    const latestTime = latest?.recordedAt || sensor.lastSeenAt;
+    return `<tr><td>${esc(sensor.name)}<br><span class="muted">${esc(sensor.metric)} · ${esc(sensor.location || 'location not supplied')}</span></td><td>${reading}</td><td>${esc(freshness(latestTime))} · ${esc(age(latestTime))}</td><td>${esc(latest?.dataQuality || 'not supplied')}</td><td>${esc(latest?.source || sensor.source || 'Not supplied')} · ${esc(recordClass(latest, sensor.dataClass))}</td><td>${samples.length} stored</td></tr>`;
+  }).join('') || '<tr><td colspan="6" class="muted">No environmental sensors or samples are available in this astronaut’s selected data view.</td></tr>';
+  const deviceRows = devices.map((device) => {
+    const samples = Array.isArray(device.readings) ? device.readings : [];
+    const latest = samples[samples.length - 1];
+    const lastSeen = latest?.recordedAt || device.lastSeenAt;
+    const latestReading = latest
+      ? `${esc(latest.metric)}: ${fmt(latest.value,2)} ${esc(latest.unit || '')}`
+      : device.batteryPercent != null || device.temperature != null
+        ? `Battery ${fmt(device.batteryPercent,1)}% · Device temperature ${fmt(device.temperature,1)} °C`
+        : 'No sample received';
+    return `<tr><td>${esc(device.name)}</td><td>${esc(device.category || 'Equipment')}</td><td>${esc(device.status || 'unknown')}</td><td>${latestReading}</td><td>${esc(freshness(lastSeen))} · ${esc(age(lastSeen))}</td><td>${esc(latest?.dataQuality || 'not supplied')} · ${esc(latest?.source || device.source || 'Not supplied')} · ${esc(recordClass(latest, device.dataClass))}</td></tr>`;
+  }).join('') || '<tr><td colspan="6" class="muted">No equipment records are available in this astronaut’s selected data view.</td></tr>';
+  const radiationMarkup = radiationRows.map((row) => {
+    const recordedAt = row.recorded_at || row.recordedAt;
+    return `<tr><td>${esc(recordedAt ? new Date(recordedAt).toLocaleString() : 'No timestamp')}</td><td>${fmt(row.value,5)} ${esc(row.unit || '')}</td><td>${fmt(row.cumulative,4)} mSv</td><td>${esc(age(recordedAt))}</td><td>${esc(row.source || 'Not supplied')} · ${esc(recordClass(row, row.data_class || row.dataClass))}</td></tr>`;
+  }).join('') || '<tr><td colspan="5" class="muted">No dosimeter readings are available in this astronaut’s selected data view.</td></tr>';
+  return `<section class="card live-streams"><div class="card-title-row"><div><h2 class="card-title">Live environment, equipment and radiation streams</h2><div class="card-kicker">Latest received values, timestamps, quality and source labels. Missing values remain visible as missing.</div></div></div>
+    <h3 class="live-stream-title">Environmental sensors</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Sensor / channel</th><th>Latest reading</th><th>Freshness</th><th>Quality</th><th>Source / data class</th><th>History</th></tr></thead><tbody>${sensorRows}</tbody></table></div>
+    <h3 class="live-stream-title">Equipment and wearables</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Device</th><th>Category</th><th>Status</th><th>Latest reading</th><th>Freshness</th><th>Quality / source / class</th></tr></thead><tbody>${deviceRows}</tbody></table></div>
+    <h3 class="live-stream-title">Dosimeter history</h3><div class="table-wrap"><table class="data-table"><thead><tr><th>Recorded</th><th>Dose rate</th><th>Cumulative dose</th><th>Age</th><th>Source / data class</th></tr></thead><tbody>${radiationMarkup}</tbody></table></div>
+    <p class="footer-note">This view reports stored source records; it does not invent telemetry. Values may be missing, stale, synthetic, or research-classified. Check units and source details before interpreting measurements.</p></section>`;
 }
