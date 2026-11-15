@@ -63,3 +63,28 @@
   .simulation-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
   .chat-msg{max-width:94%}
 }
+
+/* Keep navigation usable on short screens and prevent wide cards from forcing page overflow. */
+.sidebar{height:100vh;height:100dvh;overflow:hidden}
+.sidebar nav{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#2a4258 transparent;padding-right:2px}
+.sidebar nav::-webkit-scrollbar{width:6px}
+.sidebar nav::-webkit-scrollbar-thumb{background:#2a4258;border-radius:6px}
+.brand,.sidebar-foot{flex:none}
+.main{min-width:0}
+.content,.card,.grid>*{min-width:0}
+.table-wrap{overflow-x:auto;max-width:100%}
+img,svg,canvas{max-width:100%}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* Static layout styles use data attributes so the strict style-src policy stays effective. */
+[data-u="u1"]{max-width:240px}
+[data-u="u2"]{margin-top:14px}
+[data-u="u3"]{padding:12px;background:#0a1826}
+[data-u="u4"]{font-size:20px}
+[data-u="u5"]{margin-top:12px}
+[data-u="u6"]{padding:12px}
+[data-u="u7"]{margin-top:10px}
+[data-u="u8"]{margin-bottom:14px}
+[data-u="u9"]{white-space:pre-wrap}
+[data-u="u10"]{margin-bottom:12px;color:#ffb3bb;border-color:#713943}
+[data-u="u11"]{margin-top:16px}
