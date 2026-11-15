@@ -112,7 +112,7 @@ function decorate() {
     const b = document.createElement('button'); b.className = 'cmd-trigger'; b.type = 'button'; b.setAttribute('aria-label', 'Open command palette');
     b.innerHTML = '<span aria-hidden="true">⌕</span><span class="lbl">Jump to…</span><kbd>Ctrl K</kbd>';
     b.addEventListener('click', open); actions.prepend(b);
-    const clock = document.createElement('span'); clock.className = 'mission-clock'; clock.title = 'Current UTC time'; actions.prepend(clock);
+    const clock = document.createElement('span'); clock.className = 'mission-clock'; clock.title = 'Current Coordinated Universal Time (UTC)'; actions.prepend(clock);
   }
   const t = $('#page-content .page-head h1')?.textContent || '';
   if (t && t !== lastTitle) {
