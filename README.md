@@ -18,6 +18,8 @@ node --env-file-if-exists=.env backend/server.mjs
 
 Open [http://127.0.0.1:4173](http://127.0.0.1:4173). On Linux or macOS, run the same command from the project directory. The database is created at `data/astra.sqlite` the first time the server starts. Stop the server with Ctrl+C.
 
+On Windows, double-click `Start-ASTRA.cmd`. Keep its console window open while using ASTRA; the sign-in page checks server availability and provides a retry control. If startup reports that port 4173 is already in use, close the other ASTRA server, or choose another port. In Command Prompt, run `set PORT=4174` then `node backend\server.mjs`; in PowerShell, run `$env:PORT=4174` then `node backend/server.mjs`. Open the URL printed by the server.
+
 For development, use `node --env-file-if-exists=.env --watch backend/server.mjs`. Train and persist a fresh Isolation Forest with `node backend/train.mjs`. Run the automated core checks with `node --test`.
 
 ### Local demonstration accounts

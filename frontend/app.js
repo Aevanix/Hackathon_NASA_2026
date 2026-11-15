@@ -733,3 +733,119 @@ openEnvironmentalSensorForm = function () {
   const options = metrics.map(([value,label]) => '<option value="' + esc(value) + '">' + esc(label) + '</option>').join('');
   openModal('Register environmental sensor','<form data-form="environment-sensor" class="form-grid"><input type="hidden" name="astronautId" value="' + esc(crew.id) + '"/><div class="field span-2"><label>Sensor name</label><input class="input" name="name" required maxlength="100" placeholder="Cabin CO₂ or suit monitor"/></div><div class="field"><label>Measurement</label><select class="select" name="metric">' + options + '</select></div><div class="field"><label>Unit</label><input class="input" name="unit" required placeholder="Choose the unit shown in the selected sensor specification"/></div><div class="field"><label>Location</label><input class="input" name="location" value="Habitat cabin"/></div><div class="field"><label>Source label</label><input class="input" name="source" value="Manual / connected source" required/></div><p class="hint span-2">Registration stores source metadata only. It does not connect spacecraft hardware. Data is labeled for the current ' + esc(dataModeLabel().toLowerCase()) + ' view.</p><div class="form-actions span-2"><button class="btn primary">Register sensor</button></div></form>');
 };
+
+// Keep the cached PWA shell useful when its local API server is not running.
+const requestApiWithDiagnostics = api;
+api = async function (path, options = {}) {
+  try {
+    return await requestApiWithDiagnostics(path, options);
+  } catch (error) {
+    if (error instanceof TypeError || error?.name === 'AbortError' || error?.name === 'TimeoutError') {
+      const unavailable = new Error('ASTRA cannot reach its local server. Start it with Start-ASTRA.cmd, keep the server window open, then retry.');
+      unavailable.code = 'server_unreachable';
+      unavailable.cause = error;
+      throw unavailable;
+    }
+    throw error;
+  }
+};
+
+let loginHealthTimer = 0;
+let loginHealthCheck = 0;
+let loginInFlight = false;
+function setLoginFeedback(message, isError = false) {
+  const feedback = document.querySelector('[data-login-feedback]');
+  if (!feedback) return;
+  feedback.textContent = message;
+  feedback.hidden = !message;
+  feedback.classList.toggle('is-error', isError);
+  feedback.setAttribute('role', isError ? 'alert' : 'status');
+}
+async function checkLoginServer() {
+  const status = document.querySelector('[data-astra-server-status]');
+  if (!status) return;
+  const check = ++loginHealthCheck;
+  status.dataset.state = 'checking';
+  status.querySelector('[data-status-copy]').textContent = 'Checking ASTRA server…';
+  try {
+    const response = await fetch('/api/healthz', { cache: 'no-store', headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const health = await response.json();
+    if (check !== loginHealthCheck || !status.isConnected) return;
+    status.dataset.state = 'online';
+    status.querySelector('[data-status-copy]').textContent = health.database
+      ? 'ASTRA server online · local database ready'
+      : 'ASTRA server online · database setup required';
+  } catch {
+    if (check !== loginHealthCheck || !status.isConnected) return;
+    status.dataset.state = 'offline';
+    status.querySelector('[data-status-copy]').textContent = 'ASTRA server unavailable · start Start-ASTRA.cmd';
+  }
+}
+function attachLoginDiagnostics() {
+  const box = document.querySelector('.login-box');
+  if (!box) return;
+  let feedback = box.querySelector('[data-login-feedback]');
+  if (!feedback) {
+    feedback = document.createElement('div');
+    feedback.className = 'login-feedback';
+    feedback.dataset.loginFeedback = '';
+    feedback.hidden = true;
+    box.querySelector('.login-form')?.before(feedback);
+  }
+  let status = box.querySelector('[data-astra-server-status]');
+  if (!status) {
+    status = document.createElement('div');
+    status.className = 'server-status';
+    status.dataset.astraServerStatus = '';
+    status.dataset.state = 'checking';
+    status.innerHTML = '<span class="server-status-dot" aria-hidden="true"></span><span data-status-copy>Checking ASTRA server…</span><button class="link-button" type="button" data-action="check-server">Retry</button>';
+    box.querySelector('.demo-login')?.before(status);
+  }
+  clearInterval(loginHealthTimer);
+  void checkLoginServer();
+  loginHealthTimer = window.setInterval(() => {
+    if (!document.querySelector('[data-form="login"]')) { clearInterval(loginHealthTimer); return; }
+    void checkLoginServer();
+  }, 15000);
+}
+
+const showLoginWithStatus = showLogin;
+showLogin = function (error = '') {
+  showLoginWithStatus(error);
+  attachLoginDiagnostics();
+};
+
+const signInWithDiagnostics = signIn;
+signIn = async function (email, password, mode = 'simulation') {
+  if (loginInFlight) return false;
+  loginInFlight = true;
+  const loginButton = document.querySelector('[data-form="login"] button[type="submit"]');
+  const demoButtons = [...document.querySelectorAll('.demo-login [data-action="demo-login"]')];
+  if (loginButton) { loginButton.disabled = true; loginButton.textContent = 'Connecting to ASTRA…'; }
+  demoButtons.forEach((button) => { button.disabled = true; });
+  setLoginFeedback('Signing in securely…');
+  try {
+    await signInWithDiagnostics(email, password, mode);
+    clearInterval(loginHealthTimer);
+    return true;
+  } catch (error) {
+    if (document.querySelector('[data-form="login"]')) setLoginFeedback(error.message || 'Sign-in failed. Check your details and retry.', true);
+    else toast(error.message || 'The mission workspace did not finish loading. Retry the page.', 'error');
+    if (error.code === 'server_unreachable') void checkLoginServer();
+    return false;
+  } finally {
+    loginInFlight = false;
+    if (loginButton?.isConnected) { loginButton.disabled = false; loginButton.textContent = 'Sign in to ASTRA  →'; }
+    demoButtons.filter((button) => button.isConnected).forEach((button) => { button.disabled = false; });
+  }
+};
+
+document.addEventListener('click', (event) => {
+  const retry = event.target.closest('[data-action="check-server"]');
+  if (!retry) return;
+  event.preventDefault();
+  void checkLoginServer();
+});
+
+if (!ASTRA.token) showLogin();

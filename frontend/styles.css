@@ -88,3 +88,21 @@ img,svg,canvas{max-width:100%}
 [data-u="u9"]{white-space:pre-wrap}
 [data-u="u10"]{margin-bottom:12px;color:#ffb3bb;border-color:#713943}
 [data-u="u11"]{margin-top:16px}
+
+/* Accessible login feedback and connection state for cached-shell/server mismatches. */
+:root{font-family:Aptos,'Segoe UI Variable','Segoe UI',system-ui,sans-serif}
+.login-box{animation:login-arrive .38s cubic-bezier(.2,.75,.25,1) both}
+.server-status{display:grid;grid-template-columns:9px 1fr auto;align-items:center;gap:9px;margin-top:16px;padding:11px 12px;border:1px solid #293d51;border-radius:9px;background:#0a1724;color:#9cafc0;font-size:10px;line-height:1.45;transition:border-color .2s,background .2s}
+.server-status-dot{width:8px;height:8px;border-radius:50%;background:#8798a8;box-shadow:0 0 0 3px #8798a81c}
+.server-status[data-state="checking"] .server-status-dot{background:var(--amber);animation:server-pulse 1s ease-in-out infinite}
+.server-status[data-state="online"]{border-color:#285741;background:#0d211d;color:#a7e4c8}
+.server-status[data-state="online"] .server-status-dot{background:var(--green);box-shadow:0 0 0 3px #5fddb126}
+.server-status[data-state="offline"]{border-color:#68414a;background:#25151d;color:#f0b6bb}
+.server-status[data-state="offline"] .server-status-dot{background:var(--red);box-shadow:0 0 0 3px #f0788226}
+.server-status .link-button{white-space:nowrap}
+.login-feedback{margin:0 0 12px;padding:11px 12px;border:1px solid #31536c;border-radius:9px;background:#102438;color:#bfe7ff;font-size:11px;line-height:1.5}
+.login-feedback.is-error{border-color:#713943;background:#27171e;color:#ffb8bf}
+.login-form .btn:disabled,.demo-login button:disabled{cursor:wait;opacity:.65}
+@keyframes login-arrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes server-pulse{50%{opacity:.45;box-shadow:0 0 0 6px #f1b75e12}}
+@media(prefers-reduced-motion:reduce){.login-box{animation:none}.server-status[data-state="checking"] .server-status-dot{animation:none}}

@@ -1093,6 +1093,17 @@ server.on('upgrade',(req,socket)=>{
 });
 
 sentinelService=startSentinelService({db,recordObservation:writeSentinelObservation,intervalMs:Number(process.env.ASTRA_SENTINEL_INTERVAL_MS||15000)});
+server.on('error',(error)=>{
+  for(const simulation of simulations.values())clearTimeout(simulation.timer);
+  sentinelService?.stop();
+  try{db.close();}catch{}
+  if(error.code==='EADDRINUSE'){
+    console.error(`ASTRA could not start: port ${PORT} is already in use. Close the other ASTRA server, or set PORT=4174 and start again.`);
+  }else{
+    console.error(`ASTRA could not start: ${error.message}`);
+  }
+  process.exitCode=1;
+});
 server.listen(PORT,HOST,()=>console.log(`ASTRA local demo at http://${HOST==='0.0.0.0'?'127.0.0.1':HOST}:${PORT} · SQLite ${dbPath}`));
 for(const s of simulations.values())armSimulation(s.id);
 process.on('SIGINT',()=>{for(const s of simulations.values())clearTimeout(s.timer);sentinelService?.stop();db.close();server.close(()=>process.exit(0));});
