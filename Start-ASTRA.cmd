@@ -21,15 +21,15 @@ if %NODE_MAJOR% LSS 24 (
   exit /b 1
 )
 
-echo Starting ASTRA. Keep this window open while you use the website.
-echo The server prints its local URL below.
-node --env-file-if-exists=.env backend\server.mjs
+echo Starting ASTRA. This window will stay open while you use the website.
+echo The launcher will wait for the server and open ASTRA in your default browser.
+node --env-file-if-exists=.env backend\launcher.mjs
 if errorlevel 1 (
   echo.
   echo ASTRA did not start. If port 4173 is busy, close the other ASTRA server or run:
   echo   set PORT=4174
-  echo   node backend\server.mjs
-  echo Then open the URL printed by the server.
+  echo   node --env-file-if-exists=.env backend\launcher.mjs
+  echo Then open the URL printed by the launcher.
   pause
   exit /b 1
 )
