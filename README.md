@@ -13,14 +13,14 @@ ASTRA is a local-first research prototype for astronaut self-monitoring and miss
 Requirements: Node.js 24 or later. The app uses Node's built-in SQLite, HTTP, WebSocket, crypto, and file APIs, so no npm package installation is needed.
 
 ```powershell
-node --env-file-if-exists=.env backend/server.mjs
+npm start
 ```
 
-Open [http://127.0.0.1:4173](http://127.0.0.1:4173). On Linux or macOS, run the same command from the project directory. The database is created at `data/astra.sqlite` the first time the server starts. Stop the server with Ctrl+C.
+`npm start` starts ASTRA, waits for its startup-ready signal, and opens the default browser. Keep the terminal window open while you use ASTRA. The SQLite database is created at `data/astra.sqlite` on first launch; stop the server with Ctrl+C.
 
-On Windows, double-click `Start-ASTRA.cmd`. Keep its console window open while using ASTRA; the sign-in page checks server availability and provides a retry control. If startup reports that port 4173 is already in use, close the other ASTRA server, or choose another port. In Command Prompt, run `set PORT=4174` then `node backend\server.mjs`; in PowerShell, run `$env:PORT=4174` then `node backend/server.mjs`. Open the URL printed by the server.
+If port 4173 is busy, close the other ASTRA server or choose another port. In PowerShell, run `$env:PORT=4174; npm start`; in Command Prompt, run `set PORT=4174` then `npm start`. Set `ASTRA_OPEN_BROWSER=false` for headless runs. Docker starts the server without opening a host browser.
 
-For development, use `node --env-file-if-exists=.env --watch backend/server.mjs`. Train and persist a fresh Isolation Forest with `node backend/train.mjs`. Run the automated core checks with `node --test`.
+For development, use `node --env-file-if-exists=.env --watch backend/server.mjs` and open the URL printed by the server. Train and persist a fresh Isolation Forest with `node backend/train.mjs`. Run the automated core checks with `node --test`.
 
 ### Local demonstration accounts
 
