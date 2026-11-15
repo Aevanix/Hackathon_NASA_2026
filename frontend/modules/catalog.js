@@ -1,0 +1,28 @@
+export const MODULES = [
+  { id: 'missions', icon: '✦', label: 'Mission selection', group: 'MISSION', state: 'active', api: ['/api/dashboard'] },
+  { id: 'overview', icon: '⌂', label: 'Mission overview', group: 'MISSION', state: 'active', api: ['/api/dashboard'] },
+  { id: 'crew', icon: '◉', label: 'Crew roster', group: 'MISSION', state: 'active', api: ['/api/astronauts'] },
+  { id: 'records', icon: '▣', label: 'Astronaut records', group: 'ACCESS', state: 'active', api: ['/api/astronauts/{id}', '/api/health/{id}'] },
+  { id: 'sentinel', icon: '◈', label: 'ASTRA SENTINEL', group: 'MISSION INTELLIGENCE', state: 'active', api: ['/api/sentinel'] },
+  { id: 'health', icon: '⌁', label: 'Health monitor', group: 'ASTRONAUT', state: 'active', api: ['/api/health/{id}', '/api/health/{id}/history'] },
+  { id: 'cardiovascular', icon: '♥', label: 'Cardiovascular', group: 'HEALTH', state: 'active', api: ['/api/health/{id}', '/api/health/{id}/trends'] },
+  { id: 'respiratory', icon: '◌', label: 'Respiratory', group: 'HEALTH', state: 'active', api: ['/api/health/{id}', '/api/health/{id}/trends'] },
+  { id: 'sleep', icon: '☾', label: 'Sleep & fatigue', group: 'HEALTH', state: 'active', api: ['/api/health/{id}', '/api/health/{id}/trends'] },
+  { id: 'activity', icon: '⌁', label: 'Activity', group: 'HEALTH', state: 'active', api: ['/api/health/{id}', '/api/health/{id}/trends'] },
+  { id: 'immune', icon: '✣', label: 'Immune research', group: 'RESEARCH SCAFFOLD', state: 'scaffold', api: [] },
+  { id: 'bone', icon: '◇', label: 'Bone health', group: 'RESEARCH SCAFFOLD', state: 'scaffold', api: [] },
+  { id: 'alerts', icon: '⚑', label: 'Alert review', group: 'MISSION', state: 'active', api: ['/api/alerts'] },
+  { id: 'trends', icon: '⌇', label: 'Health trends', group: 'ANALYTICS', state: 'active', api: ['/api/health/{id}/trends'] },
+  { id: 'assistant', icon: '✧', label: 'Health assistant', group: 'INTELLIGENCE', state: 'active', api: ['/api/assistant/chat', '/api/assistant/history'] },
+  { id: 'wellness', icon: '♡', label: 'Behavioral wellness', group: 'PERSONAL', state: 'active', api: ['/api/wellness'] },
+  { id: 'radiation', icon: '☼', label: 'Radiation', group: 'PERSONAL', state: 'active', api: ['/api/radiation'] },
+  { id: 'environment', icon: '⌁', label: 'Environment', group: 'MISSION SYSTEMS', state: 'active', api: ['/api/environment'] },
+  { id: 'equipment', icon: '▤', label: 'Equipment', group: 'MISSION SYSTEMS', state: 'active', api: ['/api/equipment'] },
+  { id: 'reports', icon: '▤', label: 'Reports', group: 'TOOLS', state: 'active', api: ['/api/reports'] },
+  { id: 'simulation', icon: '⏵', label: 'Simulation lab', group: 'TOOLS', state: 'active', api: ['/api/simulation'] },
+  { id: 'data', icon: '⇧', label: 'Dataset import', group: 'TOOLS', state: 'active', api: ['/api/data/import'] },
+  { id: 'admin', icon: '⚙', label: 'Administration', group: 'SYSTEM', state: 'active', api: ['/api/admin/users', '/api/admin/missions', '/api/admin/audit'] },
+  { id: 'settings', icon: '◌', label: 'Settings', group: 'SYSTEM', state: 'active', api: ['/api/auth/me'] },
+];
+
+export const MODULES_BY_ID = Object.fromEntries(MODULES.map((module) => [module.id, module]));

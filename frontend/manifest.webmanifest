@@ -1,0 +1,9 @@
+{
+  "name": "ASTRA Mission Health",
+  "short_name": "ASTRA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07111e",
+  "theme_color": "#07111e",
+  "icons": [{ "src": "/mark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

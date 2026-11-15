@@ -1,0 +1,15 @@
+{
+  "name": "astra-spaceflight-health",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local-first spaceflight health monitoring research prototype",
+  "x-ai-assistance": "AI-assisted source code, interface copy, and initial reference summaries. All seeded health telemetry and model training/evaluation data are synthetic; see data/provenance.json and docs/ai-use.md.",
+  "scripts": {
+    "start": "node backend/server.mjs",
+    "dev": "node --watch backend/server.mjs",
+    "test": "node --test",
+    "train": "node backend/train.mjs"
+  },
+  "engines": { "node": ">=24" }
+}

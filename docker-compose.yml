@@ -1,0 +1,14 @@
+services:
+  astra:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      HOST: 0.0.0.0
+      PORT: 4173
+      ASTRA_DB_PATH: /app/data/astra.sqlite
+    ports:
+      - "127.0.0.1:${PORT:-4173}:4173"
+    volumes:
+      - ./data:/app/data

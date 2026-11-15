@@ -1,0 +1,7 @@
+.git
+.env
+data/*
+work/
+outputs/
+node_modules/
+coverage/

@@ -1,0 +1,8 @@
+.env
+data/*.sqlite*
+data/isolation-forest.json
+node_modules/
+coverage/
+work/
+outputs/
+.DS_Store

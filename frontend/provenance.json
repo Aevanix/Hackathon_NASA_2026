@@ -1,0 +1,12 @@
+{
+  "project": "ASTRA",
+  "researchPrototype": true,
+  "aiAssistance": "Source code, interface copy, and initial curated source summaries were developed with AI assistance.",
+  "demoProfiles": "Fictional identities generated for demonstration.",
+  "healthReadings": "Synthetic time-series values generated locally by code; not astronaut measurements.",
+  "radiationReadings": "Synthetic demonstration values unless an imported source is explicitly recorded.",
+  "modelTrainingData": "Synthetic normalized reference telemetry generated locally by code.",
+  "clinicalValidation": false,
+  "externalDataDownloads": false,
+  "lastReviewed": "2026-11-15"
+}
