@@ -33,12 +33,46 @@ CREATE TABLE IF NOT EXISTS data_sources (
   id INTEGER PRIMARY KEY, name TEXT NOT NULL, source_type TEXT NOT NULL,
   description TEXT NOT NULL, created_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS research_measurements (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  client_id TEXT UNIQUE,
+  astronaut_id TEXT NOT NULL REFERENCES astronauts(id),
+  mission_id TEXT NOT NULL REFERENCES missions(id),
+  domain TEXT NOT NULL CHECK(domain IN ('bone','immune')),
+  metric TEXT NOT NULL,
+  value REAL NOT NULL,
+  unit TEXT NOT NULL,
+  recorded_at TEXT NOT NULL,
+  source TEXT NOT NULL,
+  instrument TEXT NOT NULL DEFAULT 'Not supplied',
+  data_quality TEXT NOT NULL DEFAULT 'not assessed',
+  simulated INTEGER NOT NULL DEFAULT 0,
+  data_class TEXT NOT NULL DEFAULT 'research',
+  study_id TEXT,
+  notes TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_research_subject_domain_time ON research_measurements(astronaut_id,domain,recorded_at DESC);
+CREATE TABLE IF NOT EXISTS external_integrations (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  mission_id TEXT NOT NULL REFERENCES missions(id),
+  token_hash TEXT NOT NULL UNIQUE,
+  token_prefix TEXT NOT NULL,
+  domains_json TEXT NOT NULL,
+  created_by TEXT NOT NULL REFERENCES users(id),
+  created_at TEXT NOT NULL,
+  last_used_at TEXT,
+  revoked_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_external_integrations_mission ON external_integrations(mission_id,revoked_at);
 CREATE TABLE IF NOT EXISTS health_readings (
   id INTEGER PRIMARY KEY AUTOINCREMENT, client_id TEXT UNIQUE, astronaut_id TEXT NOT NULL REFERENCES astronauts(id),
   heart_rate REAL, hrv REAL, spo2 REAL, respiratory_rate REAL, temperature REAL,
   activity_level REAL, sleep_duration REAL, parameter TEXT, value REAL, unit TEXT,
   recorded_at TEXT NOT NULL, source TEXT NOT NULL, data_quality TEXT NOT NULL DEFAULT 'good',
-  simulated INTEGER NOT NULL DEFAULT 1, synced_at TEXT, data_class TEXT NOT NULL DEFAULT 'connected'
+  simulated INTEGER NOT NULL DEFAULT 1, synced_at TEXT, data_class TEXT NOT NULL DEFAULT 'connected',
+  equipment_id TEXT REFERENCES equipment(id)
 );
 CREATE INDEX IF NOT EXISTS idx_health_astronaut_time ON health_readings(astronaut_id, recorded_at DESC);
 CREATE TABLE IF NOT EXISTS sleep_records (

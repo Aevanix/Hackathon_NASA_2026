@@ -1,0 +1,25 @@
+:root{color-scheme:dark;--bg:#030609;--surface:#080d13;--surface-2:#0c131b;--surface-3:#111b25;--line:#202b37;--text:#f1f5f8;--muted:#91a0af;--astra-font:Aptos,'Segoe UI Variable','Segoe UI',system-ui,sans-serif;font-family:var(--astra-font)}
+*{font-family:var(--astra-font)!important}
+body{background:#030609;color:var(--text)}
+.brand-mark,.avatar{background:#101c28;color:#b2e4ff}
+.app-shell .sidebar{background:rgba(4,8,13,.97);border-color:#1c2732}
+.app-shell .topbar{background:rgba(3,6,9,.9);border-color:#19232e}
+.app-shell .card{background:linear-gradient(145deg,rgba(12,18,25,.97),rgba(7,12,17,.98));border-color:#1d2833}
+.app-shell .nav-link:hover,.app-shell .nav-link.active{background:#111b25}
+.app-shell .input,.app-shell .select,.app-shell .textarea,.app-shell .select-inline{background:#070c11;border-color:#283541;color:#edf4f8}
+.login-page{--pointer-x:0px;--pointer-y:0px;--pointer-glow-x:50%;--pointer-glow-y:44%;position:relative;isolation:isolate;overflow:hidden;background:#020407;min-height:100vh}
+.login-page:before{content:"";position:absolute;inset:-18px;z-index:-2;background-image:linear-gradient(90deg,rgba(2,5,9,.7) 0%,rgba(2,5,9,.3) 46%,rgba(2,5,9,.18) 100%),linear-gradient(0deg,rgba(2,5,9,.86),transparent 42%,rgba(2,5,9,.24)),url("https://images-assets.nasa.gov/image/NHQ202211160003/NHQ202211160003~orig.jpg");background-position:center,center,calc(50% + var(--pointer-x)) calc(50% + var(--pointer-y));background-size:cover,cover,cover;background-repeat:no-repeat;transform:scale(1.025);transition:background-position .28s ease-out;filter:saturate(.82) brightness(.64)}
+.login-page:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(460px circle at var(--pointer-glow-x) var(--pointer-glow-y),rgba(61,169,225,.1),transparent 70%),radial-gradient(ellipse at 72% 50%,transparent 0,rgba(2,5,9,.08) 42%,rgba(2,5,9,.72) 100%)}
+.login-hero{background:linear-gradient(90deg,rgba(2,5,9,.68),rgba(2,5,9,.08));}
+.login-hero:before{border-color:#a4dfff20;box-shadow:0 0 0 45px #84cfff0a,0 0 0 46px #a6ddff17,0 0 0 110px #84cfff06,0 0 0 111px #a6ddff12}
+.login-panel{background:linear-gradient(110deg,rgba(3,7,11,.38),rgba(3,7,11,.82));border-left-color:#b2dfff20;backdrop-filter:blur(8px)}
+.login-box{padding:clamp(20px,3vw,32px);border:1px solid rgba(190,220,240,.14);border-radius:18px;background:rgba(4,9,14,.78);box-shadow:0 28px 90px rgba(0,0,0,.34);backdrop-filter:blur(18px)}
+.login-box .eyebrow{color:#87d5ff}.login-box h2{letter-spacing:-.035em}.login-form{gap:16px}.login-form .input,.login-form .select{min-height:46px;background:rgba(3,8,13,.88);border-color:#33404b}.login-form .input:focus,.login-form .select:focus{border-color:#50b8ed;box-shadow:0 0 0 3px rgba(63,174,226,.16)}
+.login-form .btn.primary{min-height:46px;background:linear-gradient(100deg,#117db1,#26a7d8);box-shadow:0 8px 24px rgba(8,117,168,.22)}
+.login-form .btn.primary:hover{transform:translateY(-1px);filter:brightness(1.12)}.login-form .btn.primary:active{transform:translateY(0)}
+.nasa-credit{display:inline-flex;margin-top:26px;color:#c3d0da;font-size:10px;letter-spacing:.035em;text-shadow:0 2px 8px #000}.nasa-credit:hover{color:#fff}
+.login-foot{color:#8b9aa8}.server-status{margin:0 0 15px;color:#aab9c7}.server-status[data-state=online] .server-status-dot{background:#51d9a2;box-shadow:0 0 9px #51d9a2}.server-status[data-state=offline] .server-status-dot{background:#ff727e;box-shadow:0 0 9px #ff727e}.server-status[data-state=checking] .server-status-dot{background:#edba65}
+.login-feedback{margin:0 0 14px;color:#aad9ee;font-size:11px;line-height:1.5}.login-feedback.is-error{border:1px solid #733f48;background:rgba(70,24,31,.42);color:#ffb5bd;padding:10px 12px;border-radius:9px}
+@media(max-width:790px){.login-hero{display:flex;min-height:35vh;padding:30px 26px 0;background:linear-gradient(180deg,rgba(2,5,9,.34),rgba(2,5,9,.15))}.login-hero:before{width:400px;height:400px;right:-45%;top:-12%}.hero-wordmark{margin-bottom:20px}.login-hero h1{font-size:clamp(27px,7vw,40px);max-width:520px}.login-hero p{font-size:12px;margin:10px 0}.hero-points{margin-top:10px}.login-panel{min-height:65vh;padding:20px 22px 30px;background:linear-gradient(180deg,rgba(2,5,9,.2),rgba(2,5,9,.76))}.login-box{width:min(460px,100%)}.nasa-credit{margin-top:8px}}
+@media(max-width:480px){.login-hero{min-height:30vh;padding:22px 18px 0}.hero-wordmark{margin-bottom:15px}.login-hero h1{font-size:29px}.login-hero p{font-size:11px;line-height:1.55}.hero-points{gap:10px;font-size:9px}.login-panel{min-height:70vh;padding:14px 14px 22px}.login-box{padding:19px;border-radius:14px}.login-box h2{font-size:22px}.login-box>p{margin-bottom:17px}.login-form{gap:13px}.login-foot{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.login-page:before,.login-form .btn.primary{transition:none}}

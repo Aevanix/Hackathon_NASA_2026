@@ -72,7 +72,7 @@ The in-app research catalog and source map describe NASA Standard Measures, OSDR
 
 ## Environment and containers
 
-Copy `.env.example` to `.env` and set a unique `JWT_SECRET`. Optional LLM variables are `ASTRA_LLM_API_KEY`, `ASTRA_LLM_BASE_URL`, and `ASTRA_LLM_MODEL`. The fallback assistant and all monitoring functions work without them.
+Copy `.env.example` to `.env` and set a unique `JWT_SECRET`. To enable the assistant, store the provider key only in `.env`; it is read by the backend and is never sent to the browser. For Google AI Studio / Gemini, set `ASTRA_LLM_API_KEY`, `ASTRA_LLM_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai`, and `ASTRA_LLM_MODEL` to a model enabled for that key. For OpenAI, set `OPENAI_API_KEY` and optionally `OPENAI_MODEL`. The assistant screens out unrelated topics and uses a health-only system prompt; this is not model training or a medical safety certification. The fallback assistant and all monitoring functions work without an external key. Rotate any key pasted in chat before adding a replacement to `.env`; `.env` is ignored by Git and must never be committed.
 
 Docker and Docker Compose files are included for environments with Docker. Docker was unavailable in the build environment, so that deployment path has not been run here. The local verified run uses SQLite; PostgreSQL, Alembic, React, FastAPI, vector embeddings, and live external data connectors are not part of this dependency-free build.
 

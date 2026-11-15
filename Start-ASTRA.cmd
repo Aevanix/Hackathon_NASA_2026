@@ -23,7 +23,7 @@ if %NODE_MAJOR% LSS 24 (
 
 echo Starting ASTRA. Keep this window open while you use the website.
 echo The server prints its local URL below.
-node backend\server.mjs
+node --env-file-if-exists=.env backend\server.mjs
 if errorlevel 1 (
   echo.
   echo ASTRA did not start. If port 4173 is busy, close the other ASTRA server or run:

@@ -1,0 +1,72 @@
+.brand-icon {
+  display: block;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgb(41 213 220 / 22%));
+}
+.hero-wordmark .brand-icon { width: 54px; height: 54px; }
+.boot .brand-icon { width: 46px; height: 46px; }
+.medical-banner {
+  position: relative;
+  isolation: isolate;
+  min-height: 178px;
+  display: flex;
+  align-items: end;
+  overflow: hidden;
+  padding: 24px;
+  border: 1px solid rgb(129 192 206 / 18%);
+  border-radius: 18px;
+  background-image: linear-gradient(90deg, rgb(3 8 14 / 94%), rgb(3 8 14 / 58%) 58%, rgb(3 8 14 / 35%)), linear-gradient(0deg, rgb(3 8 14 / 58%), transparent 68%), var(--medical-image);
+  background-position: center, center, center 42%;
+  background-size: cover;
+  box-shadow: inset 0 0 70px rgb(0 0 0 / 25%);
+}
+.medical-banner::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: radial-gradient(ellipse at 82% 16%, rgb(44 213 220 / 18%), transparent 42%);
+  content: "";
+}
+.medical-banner-copy { max-width: 720px; }
+.medical-banner-copy h2 { margin: 5px 0 8px; font-size: clamp(1.25rem, 3vw, 1.8rem); }
+.medical-banner-copy p { max-width: 68ch; margin: 0; color: #d2e2e9; }
+.medical-banner .eyebrow { color: #6fe3dc; }
+.research-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.research-toolbar .field { min-width: min(230px, 100%); }
+.record-source { color: var(--muted, #a1b0bb); font-size: .8rem; }
+.synthetic-note { border-left: 3px solid #f2b85c; }
+.integration-key {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 12px 14px;
+  border: 1px solid rgb(111 227 220 / 32%);
+  border-radius: 10px;
+  background: #07141a;
+  color: #bdf7ed;
+  font: 500 .9rem/1.5 ui-monospace, Consolas, monospace;
+  user-select: all;
+}
+.api-example { max-height: 360px; overflow: auto; padding: 14px; border: 1px solid var(--line, #23313a); border-radius: 12px; background: #080d11; color: #c7d8df; font-size: .78rem; }
+.report-preview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.report-preview-item { padding: 12px; border: 1px solid var(--line, #23313a); border-radius: 12px; background: rgb(255 255 255 / 2%); }
+.report-preview-item span { display: block; color: var(--muted, #a1b0bb); font-size: .78rem; }
+.report-preview-item b { display: block; margin-top: 5px; }
+.chart-wrap { height: 360px; min-height: 300px; }
+.chart-wrap svg { display: block; width: 100%; height: 100%; }
+.chart-point-outlier { fill: #ffad62; stroke: #332117; stroke-width: 2.5; }
+.chart-toolbar { align-items: flex-end; flex-wrap: wrap; }
+.chart-controls { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: flex-end; gap: 10px; }
+.chart-controls .field { min-width: 150px; }
+.chart-controls .select-inline { max-width: min(280px, 66vw); }
+@media (max-width: 680px) {
+  .medical-banner { min-height: 220px; padding: 18px; background-position: center, center, 58% center; }
+  .report-preview-grid { grid-template-columns: 1fr; }
+  .chart-wrap { height: 280px; min-height: 240px; }
+  .chart-toolbar { align-items: stretch; }
+  .chart-controls { justify-content: flex-start; width: 100%; }
+  .chart-controls .field { flex: 1 1 145px; min-width: 0; }
+  .chart-controls .select-inline { width: 100%; max-width: 100%; }
+}

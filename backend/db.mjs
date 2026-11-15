@@ -28,6 +28,7 @@ for (const [table, column, definition] of [
   ['health_alerts', 'simulated', 'INTEGER NOT NULL DEFAULT 0'],
   ['health_alerts', 'data_class', "TEXT NOT NULL DEFAULT 'connected'"],
   ['health_readings', 'data_class', "TEXT NOT NULL DEFAULT 'connected'"],
+  ['health_readings', 'equipment_id', 'TEXT REFERENCES equipment(id)'],
   ['radiation_readings', 'data_class', "TEXT NOT NULL DEFAULT 'connected'"],
   ['wellness_assessments', 'simulated', 'INTEGER NOT NULL DEFAULT 0'],
   ['wellness_assessments', 'data_class', "TEXT NOT NULL DEFAULT 'self_report'"],
@@ -37,6 +38,7 @@ for (const [table, column, definition] of [
   const columns = db.prepare(`PRAGMA table_info(${table})`).all();
   if (!columns.some((item) => item.name === column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
 }
+db.exec('CREATE INDEX IF NOT EXISTS idx_health_equipment_time ON health_readings(equipment_id, recorded_at DESC)');
 db.exec(`UPDATE environmental_sensors SET created_at=COALESCE(NULLIF(created_at,''),last_seen_at,strftime('%Y-%m-%dT%H:%M:%fZ','now')) WHERE created_at='';
   UPDATE equipment SET created_at=COALESCE(NULLIF(created_at,''),last_seen_at,strftime('%Y-%m-%dT%H:%M:%fZ','now')) WHERE created_at='';`);
 db.exec(`UPDATE anomaly_predictions SET simulated=1 WHERE features_json LIKE '%"simulated":true%' OR features_json LIKE '%"simulated":1%';
@@ -102,6 +104,10 @@ const insertEquipment = db.prepare(`INSERT OR IGNORE INTO equipment(id,mission_i
   VALUES(?,'MISSION-01',?,?,?,?,?,?,?,?,1,'simulation',?,?)`);
 const insertEquipmentReading = db.prepare(`INSERT OR IGNORE INTO equipment_readings(client_id,equipment_id,metric,value,unit,recorded_at,source,data_quality,simulated,data_class)
   VALUES(?,?,?,?,?,?,'SIMULATED • ASTRA equipment model','good',1,'simulation')`);
+const insertResearchMeasurement = db.prepare(`INSERT OR IGNORE INTO research_measurements
+  (client_id,astronaut_id,mission_id,domain,metric,value,unit,recorded_at,source,instrument,data_quality,simulated,data_class,study_id,notes,created_at)
+  VALUES(?,?,?,?,?,?,?,?,?,?,'synthetic demonstration',1,'simulation',NULL,?,?)`);
+const seedResearch = !db.prepare("SELECT 1 FROM research_measurements WHERE source='SIMULATED • ASTRA research history' LIMIT 1").get();
 
 for (const [id, name, mission, hr, hrv, spo2, rr, temp, sleep] of astronauts) {
   insertAstronaut.run(id, name, mission, timestamp.slice(0, 10), 180, officerId, timestamp);
@@ -125,6 +131,30 @@ for (const [id, name, mission, hr, hrv, spo2, rr, temp, sleep] of astronauts) {
       const radiation = +(0.018 + Math.abs(wobble(5, 0.006))).toFixed(4);
       const cumulative = +(0.24 + (35 - i) * 0.018 + seed % 10 / 1000).toFixed(3);
       insertRadiation.run(id, radiation, 'mSv/day', cumulative, recordedAt, 'SIMULATED • ASTRA seed dataset');
+    }
+  }
+  if (seedResearch) {
+    const researchRows = [];
+    for (let week = 12; week >= 0; week--) {
+      const recordedAt = new Date(Date.now() - week * 7 * 86400000).toISOString();
+      const wobble = (phase, scale) => Math.sin((week + seed % 13) * .37 + phase) * scale + Math.cos((week + phase) * .19) * scale * .35;
+      const source = 'SIMULATED • ASTRA research history';
+      const instrument = 'Synthetic reference instrument';
+      researchRows.push(
+        ['bone','serum_ctx',+(0.31 + (12-week)*0.008 + wobble(1,.018)).toFixed(3),'ng/mL','Synthetic bone-turnover series; no clinical interpretation.'],
+        ['bone','serum_p1np',+(49 - (12-week)*0.42 + wobble(2,1.4)).toFixed(1),'µg/L','Synthetic bone-turnover series; no clinical interpretation.'],
+        ['immune','absolute_lymphocyte_count',+(1.72 + wobble(3,.16) - (week < 4 ? .04 : 0)).toFixed(2),'10^9/L','Synthetic immune-panel series; no clinical interpretation.'],
+        ['immune','neutrophil_count',+(3.05 + wobble(4,.24) + (week < 3 ? .08 : 0)).toFixed(2),'10^9/L','Synthetic immune-panel series; no clinical interpretation.'],
+        ['immune','crp',+(1.8 + Math.abs(wobble(5,1.15))).toFixed(2),'mg/L','Synthetic immune-panel series; no clinical interpretation.'],
+        ['immune','il6',+(1.45 + Math.abs(wobble(6,.72))).toFixed(2),'pg/mL','Synthetic immune-panel series; no clinical interpretation.'],
+      );
+      if (week === 12 || week === 0) {
+        const elapsed = week === 12 ? 0 : 1;
+        researchRows.push(['bone','lumbar_spine_bmd',+(1.12 - elapsed * .016 + wobble(7,.002)).toFixed(3),'g/cm²','Sparse synthetic scan checkpoints; cadence is illustrative only.']);
+      }
+      for (const [domain,metric,value,unit,notes] of researchRows.splice(0)) {
+        insertResearchMeasurement.run(`seed-${id}-${domain}-${metric}-${week}`,id,'MISSION-01',domain,metric,value,unit,recordedAt,source,instrument,notes,nowIso());
+      }
     }
   }
   if (seedEnvironment) {
@@ -162,6 +192,9 @@ for (const [id, name, mission, hr, hrv, spo2, rr, temp, sleep] of astronauts) {
     }
   }
 }
+
+db.exec(`UPDATE health_readings SET equipment_id=(SELECT e.id FROM equipment e WHERE e.astronaut_id=health_readings.astronaut_id AND (lower(e.category)='wearable' OR lower(e.name) LIKE '%wearable%') ORDER BY e.created_at LIMIT 1)
+  WHERE equipment_id IS NULL AND source LIKE 'SIMULATED%' AND EXISTS(SELECT 1 FROM equipment e WHERE e.astronaut_id=health_readings.astronaut_id AND (lower(e.category)='wearable' OR lower(e.name) LIKE '%wearable%'));`);
 
 const sourceInsert = db.prepare('INSERT OR IGNORE INTO data_sources(id,name,source_type,description,created_at) VALUES(?,?,?,?,?)');
 sourceInsert.run(1, 'Astra local simulator', 'synthetic', 'Timestamped demo telemetry generated on this server.', timestamp);

@@ -21,7 +21,6 @@
 .live-monitor-flag .status-dot{background:var(--green)}
 .mission-grid{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .launch-card-link{color:#8ed6ff}
-.demo-credential-ids{margin:0 0 9px;padding:8px;border:1px solid #26415a;border-radius:7px;background:#0b1724;color:#b8d3e8;overflow-wrap:anywhere}
 .live-streams{margin-top:14px}
 .live-stream-title{margin:18px 0 8px;color:#cce0ef;font-size:11px;font-weight:600}
 .live-streams .table-wrap{max-height:310px}

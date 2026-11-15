@@ -1,5 +1,5 @@
-const CACHE = 'astra-shell-v11';
-const SHELL = ['/', '/styles.css?v=11', '/operations.css?v=1', '/polish.css?v=1', '/upgrade.css?v=1', '/app.js?v=11', '/modules/catalog.js?v=4', '/modules/operations.js?v=5', '/modules/polish.js?v=1', '/modules/upgrade.js?v=1', '/mark.svg', '/manifest.webmanifest'];
+const CACHE = 'astra-shell-v15';
+const SHELL = ['/', '/styles.css?v=11', '/operations.css?v=1', '/polish.css?v=1', '/upgrade.css?v=1', '/night.css?v=1', '/medical.css?v=2', '/app.js?v=15', '/modules/catalog.js?v=4', '/modules/operations.js?v=5', '/modules/medical-data.js?v=1', '/modules/polish.js?v=1', '/modules/upgrade.js?v=1', '/modules/login-effects.js?v=1', '/astra-mark.png', '/manifest.webmanifest'];
 self.addEventListener('install', (event) => event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting())));
 self.addEventListener('activate', (event) => event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key.startsWith('astra-shell-') && key !== CACHE).map((key) => caches.delete(key)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', (event) => {
