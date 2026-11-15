@@ -1299,7 +1299,7 @@ server.on('error',(error)=>{
   }
   process.exitCode=1;
 });
-server.listen(PORT,HOST,()=>console.log(`ASTRA local demo at http://${HOST==='0.0.0.0'?'127.0.0.1':HOST}:${PORT} · SQLite ${dbPath}`));
+server.listen(PORT,HOST,()=>{console.log(`ASTRA local demo at http://${HOST==='0.0.0.0'?'127.0.0.1':HOST}:${PORT} · SQLite ${dbPath}`);if(typeof process.send==='function')process.send({type:'astra.ready',port:PORT});});
 for(const s of simulations.values())armSimulation(s.id);
 process.on('SIGINT',()=>{for(const s of simulations.values())clearTimeout(s.timer);sentinelService?.stop();db.close();server.close(()=>process.exit(0));});
 process.on('SIGTERM',()=>{for(const s of simulations.values())clearTimeout(s.timer);sentinelService?.stop();db.close();server.close(()=>process.exit(0));});
