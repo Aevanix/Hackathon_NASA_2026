@@ -830,13 +830,14 @@ openEnvironmentalSensorForm = function () {
 };
 
 // Keep the cached PWA shell useful when its local API server is not running.
+const SERVER_UNREACHABLE_MESSAGE = 'ASTRA cannot reach its local server. Start it with Start-ASTRA.cmd, keep the server window open, then retry.';
 const requestApiWithDiagnostics = api;
 api = async function (path, options = {}) {
   try {
     return await requestApiWithDiagnostics(path, options);
   } catch (error) {
     if (error instanceof TypeError || error?.name === 'AbortError' || error?.name === 'TimeoutError') {
-      const unavailable = new Error('ASTRA cannot reach its local server. Start it with Start-ASTRA.cmd, keep the server window open, then retry.');
+      const unavailable = new Error(SERVER_UNREACHABLE_MESSAGE);
       unavailable.code = 'server_unreachable';
       unavailable.cause = error;
       throw unavailable;
@@ -863,7 +864,7 @@ async function checkLoginServer() {
   status.dataset.state = 'checking';
   status.querySelector('[data-status-copy]').textContent = 'Checking ASTRA server…';
   try {
-    const response = await fetch('/api/healthz', { cache: 'no-store', headers: { Accept: 'application/json' } });
+    const response = await fetch('/api/healthz', { cache: 'no-store', headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(4_000) });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const health = await response.json();
     if (check !== loginHealthCheck || !status.isConnected) return;
@@ -871,6 +872,10 @@ async function checkLoginServer() {
     status.querySelector('[data-status-copy]').textContent = health.database
       ? 'ASTRA server online · local database ready'
       : 'ASTRA server online · database setup required';
+    const staleNotice = document.querySelector('.login-box .notice[data-u="u10"]');
+    if (staleNotice?.textContent.trim() === SERVER_UNREACHABLE_MESSAGE) staleNotice.remove();
+    const staleFeedback = document.querySelector('[data-login-feedback]');
+    if (staleFeedback?.textContent.trim() === SERVER_UNREACHABLE_MESSAGE) setLoginFeedback('');
   } catch {
     if (check !== loginHealthCheck || !status.isConnected) return;
     status.dataset.state = 'offline';
